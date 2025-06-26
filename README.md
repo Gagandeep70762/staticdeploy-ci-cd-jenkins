@@ -1,173 +1,95 @@
 
-# 🚀 Jenkins CI/CD Pipeline on AWS EC2 - Full Project Setup with Slave Nodes and GitHub Webhook
+# 🚀 Jenkins CI/CD on AWS EC2 - Static Site Deployment (Video-Based)
 
-This guide demonstrates how to set up a Jenkins-based CI/CD pipeline on **AWS EC2 (Amazon Linux)** with:
-- Master-slave Jenkins architecture
-- GitHub integration using webhooks
-- Deployment of a website through pipeline on Slave 1
-- Instant code update via GitHub reflected live
+This guide walks you through building a CI/CD pipeline on **Amazon EC2 (Amazon Linux)** using Jenkins, based on the steps shown in the referenced video.
 
 ---
 
-## 🧩 Architectural Overview
+## ✅ Step-by-Step Setup with Screenshots
 
-![Architecture Diagram](1.png)
+### 🔹 0.1 - Launch Jenkins Master EC2 Instance
+Launch an Amazon Linux EC2 instance to host Jenkins Master. Use default ports 22 and 8080 for SSH and Jenkins access.
 
-**Flow:**
-1. Developer pushes code to **GitHub**
-2. GitHub webhook triggers Jenkins Master on EC2
-3. Jenkins Master assigns build to **Slave 1**
-4. Slave 1 builds and hosts the website (port 85 enabled)
-5. Slave 2 acts as an additional node for scalability or future pipeline stages
+![Launch EC2](images/step-0.1-launch-ec2-instance.png)
 
 ---
 
-## 🔐 EC2 Instance Configuration
+### 🔹 0.2 - Add User Data to Install Java & Jenkins Automatically
+During instance launch, go to **Advanced → User Data** and add the shell script to install Jenkins.
 
-### Jenkins Master EC2:
-- OS: Amazon Linux 2023
-- Instance Type: t2.medium
-- Security Group Rules:
-  - TCP 22: SSH
-  - TCP 80: HTTP
-  - TCP 8080: Jenkins UI
-  - TCP 40933: Jenkins agents
-
-![Security Group](4.png)
+![User Data](images/step-0.2-user-data-install-jenkins.png)
 
 ---
 
-## ⚙️ Install Jenkins using User Data
+### 🔹 1 - Access Jenkins via Public IP and Port 8080
+Once Jenkins is running, open your browser and go to:
 
-While launching the EC2 Master, add this User Data:
-
-![User Data](11.jpeg)
-
-```bash
-#!/bin/bash
-sudo dnf update
-sudo dnf install java-17-amazon-corretto -y
-sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
-sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
-sudo dnf install jenkins -y
-sudo systemctl enable jenkins
-sudo systemctl start jenkins
+```
+http://<EC2-PUBLIC-IP>:8080
 ```
 
+You will be prompted to unlock Jenkins.
+
+![Access Jenkins](images/step-1-access-jenkins-8080.png)
+
 ---
 
-## 🔑 Unlock Jenkins First Login
-
-Visit `http://<Jenkins-Master-Public-IP>:8080`
-
-![Unlock Jenkins](12.jpeg)
-
-Use the password from EC2 instance:
-
-![Initial Password from EC2](13.png)
+### 🔹 2 - Unlock Jenkins Using Initial Password
+SSH into the EC2 instance and run:
 
 ```bash
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 ```
 
----
+Paste the password into the browser.
 
-## 🧱 Install Jenkins Plugins
-
-Install suggested plugins during setup:
-
-![Plugins Install](14.png)
+![Unlock Jenkins](images/step-2-unlock-jenkins.png)
 
 ---
 
-## 🔌 Configure GitHub Webhook
+### 🔹 3 - Install Suggested Jenkins Plugins
+Select **Install Suggested Plugins** to get basic Jenkins functionality ready.
 
-In your GitHub repository:
-- Go to Settings → Webhooks → Add webhook
-- Payload URL: `http://<Jenkins-Master-IP>:8080/github-webhook/`
-- Content type: `application/json`
-- Enable push events
-
-![GitHub Webhook](15.png)
+![Install Plugins](images/step-3-install-plugins.png)
 
 ---
 
-## 🔀 Configure Jenkins Master-Slave Connection
+### 🔹 4 - Create Slave 1 and Allow Port 85 in Security Group
+- Create a new EC2 instance as **Slave 1**.
+- Edit its Security Group to **allow port 85** (for serving web content).
+- Configure the slave node from Jenkins UI.
 
-### TCP Port for Inbound Agents
-
-![Agent TCP Port](16.jpeg)
-
-- Go to **Manage Jenkins > Configure Global Security**
-- Enable and set **TCP port for agents** to a fixed value, e.g., `40933`
-
-### Add Slave 1 Node
-
-- Go to **Manage Jenkins > Nodes > New Node**
-- Set name: `Slave1`
-- Remote directory: `/home/ec2-user`
-- Launch method: Connect from agent to controller
-
-![Slave Node Setup](17.jpeg)
+![Create Slave1 & Allow Port 85](images/step-4-create-slave1-port85.png)
 
 ---
 
-## 📦 Create Jenkins Pipeline
+### 🔹 5 - Build Pipeline to Deploy Static Website via Slave1
+- Create a Jenkins pipeline.
+- The pipeline runs a Python HTTP server on port 85.
+- Access the live website:
 
-1. Create a new pipeline job
-2. Use GitHub as SCM source
-3. Sample pipeline:
-
-```groovy
-pipeline {
-  agent { label 'Slave1' }
-  stages {
-    stage('Build') {
-      steps {
-        echo "The Jenkins agent is connected"
-      }
-    }
-  }
-}
+```
+http://<Slave1-PUBLIC-IP>:85
 ```
 
-4. Run the pipeline. Output confirms Slave1 is active:
-
-![Jenkins Success](18.jpeg)
+![Verify Site on Port 85](images/step-5-verify-pipeline-site-on-port85.png)
 
 ---
 
-## 🌐 Website Hosting via Slave1 (Port 85)
+## 🔁 GitHub Integration & Live Update
 
-Update the Security Group of **Slave1** to allow TCP port **85**.
-
-- Create pipeline stage to run a local HTTP server on port 85
-
-```groovy
-stage('Serve Site') {
-  steps {
-    sh 'python3 -m http.server 85 &'
-  }
-}
-```
-
-Visit: `http://<Slave1-Public-IP>:85`
+- Push code to GitHub → triggers webhook to Jenkins
+- Pipeline runs again → website updates instantly
 
 ---
 
-## 🧪 GitHub Code Update Reflects Instantly
+## 📌 Final Notes
 
-1. Push an updated `index.html` or app file to GitHub
-2. Webhook triggers Jenkins Master → triggers pipeline on Slave1
-3. Output seen in browser instantly (served via updated port 85 content)
+- Jenkins Master handles orchestration
+- Slave1 builds and serves website
+- GitHub triggers jobs automatically
+- Pipeline demonstrates end-to-end CI/CD with instant updates
 
 ---
 
-## 🌟 Final Highlights
-
-- GitHub → Jenkins webhook trigger tested
-- Jenkins Master on EC2 Amazon Linux with Java 17
-- Master triggers Slave1 pipeline via label
-- Slave1 hosts static site via Python server
-- Slave2 ready as secondary agent
-
+⏳ Let me know when you're ready to upload images for each step (0.1 to 5), and I’ll regenerate the final README with them embedded.
