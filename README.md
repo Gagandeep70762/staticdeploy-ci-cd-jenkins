@@ -1,4 +1,3 @@
-
 ## 🖥️ 9 - Configure Slave1 EC2 Instance and Agent Connection
 
 - Launch a new EC2 Instance named **Jenkins Slave1**
@@ -110,7 +109,7 @@ docker run -d -p 85:80 gagan
 ## 🌟 Final Highlights
 
 - ✅ End-to-end CI/CD pipeline built using **Jenkins**, **GitHub**, **Docker**, and **EC2**
-- 🔄 Real-time updates with **GitHub Webhooks** triggering Jenkins builds
+- ♻️ Real-time updates with **GitHub Webhooks** triggering Jenkins builds
 - 🚀 Static site deployment on **EC2 Slave1** with port 85 exposed
 - 🖥️ Confirmed content updates pushed to GitHub reflected instantly live
 
