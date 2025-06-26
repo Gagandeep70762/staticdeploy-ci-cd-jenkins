@@ -1,95 +1,124 @@
 
-# 🚀 Jenkins CI/CD on AWS EC2 - Static Site Deployment (Video-Based)
+## 🖥️ 9 - Configure Slave1 EC2 Instance and Agent Connection
 
-This guide walks you through building a CI/CD pipeline on **Amazon EC2 (Amazon Linux)** using Jenkins, based on the steps shown in the referenced video.
-
----
-
-## ✅ Step-by-Step Setup with Screenshots
-
-### 🔹 0.1 - Launch Jenkins Master EC2 Instance
-Launch an Amazon Linux EC2 instance to host Jenkins Master. Use default ports 22 and 8080 for SSH and Jenkins access.
-
-![Launch EC2](images/step-0.1-launch-ec2-instance.png)
-
----
-
-### 🔹 0.2 - Add User Data to Install Java & Jenkins Automatically
-During instance launch, go to **Advanced → User Data** and add the shell script to install Jenkins.
-
-![User Data](images/step-0.2-user-data-install-jenkins.png)
-
----
-
-### 🔹 1 - Access Jenkins via Public IP and Port 8080
-Once Jenkins is running, open your browser and go to:
-
-```
-http://<EC2-PUBLIC-IP>:8080
-```
-
-You will be prompted to unlock Jenkins.
-
-![Access Jenkins](images/step-1-access-jenkins-8080.png)
-
----
-
-### 🔹 2 - Unlock Jenkins Using Initial Password
-SSH into the EC2 instance and run:
+- Launch a new EC2 Instance named **Jenkins Slave1**
+- Use Amazon Linux 2 and add the following commands to **User Data** for setup:
 
 ```bash
-sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+#!/bin/bash
+sudo yum update -y
+sudo yum install java-1.8.0-openjdk -y
+sudo yum install docker -y
+sudo systemctl start docker
+sudo usermod -aG docker ec2-user
 ```
 
-Paste the password into the browser.
-
-![Unlock Jenkins](images/step-2-unlock-jenkins.png)
+📸 *Image 9.0: Slave1 EC2 Setup — `3.jpeg`*
 
 ---
 
-### 🔹 3 - Install Suggested Jenkins Plugins
-Select **Install Suggested Plugins** to get basic Jenkins functionality ready.
+## 🔌 10 - Add Node Entry for Slave1 in Jenkins
 
-![Install Plugins](images/step-3-install-plugins.png)
+- In Jenkins → Manage Jenkins → Nodes → New Node
+- Enter: `slave1`, choose Permanent Agent
+- Add SSH credentials, use same Public IP and port
 
----
-
-### 🔹 4 - Create Slave 1 and Allow Port 85 in Security Group
-- Create a new EC2 instance as **Slave 1**.
-- Edit its Security Group to **allow port 85** (for serving web content).
-- Configure the slave node from Jenkins UI.
-
-![Create Slave1 & Allow Port 85](images/step-4-create-slave1-port85.png)
+📸 *Image 10.0: Node Entry Configuration — `22.jpeg`*
 
 ---
 
-### 🔹 5 - Build Pipeline to Deploy Static Website via Slave1
-- Create a Jenkins pipeline.
-- The pipeline runs a Python HTTP server on port 85.
-- Access the live website:
+## 🔧 11 - Create GitHub Integration Pipeline
 
+- Create new Jenkins Pipeline job: `GitHub-CI-Test`
+- Add GitHub Repository URL under Source Code Management (SCM)
+- Use `main` branch
+
+📸 *Image 11.0: GitHub Repo Config in Jenkins — `23.jpeg`*
+
+- Add pipeline script with Docker build steps
+
+📸 *Image 11.1: Pipeline Dockerfile & Configuration — `24.jpeg`*
+
+- Save and build → Green success tick
+
+📸 *Image 11.2: Successful CI Build in Jenkins — `26.jpeg`*
+
+---
+
+## 🌐 12 - Add Webhook in GitHub Repository Settings
+
+- Go to GitHub → Repo Settings → Webhooks → Add Webhook
+- Payload URL: `http://<jenkins_public_ip>:8080/github-webhook/`
+- Content type: `application/json`
+
+📸 *Image 12.0: GitHub Webhook Config — `4.png`*
+
+📸 *Image 12.1: GitHub Webhook Delivery Example — `5.jpg`*
+
+---
+
+## ⚙️ 13 - Final DevOps Pipeline Execution (Production Build)
+
+- Create pipeline: `DevOps-Production`
+- Add same GitHub repository & credentials
+
+📸 *Image 13.0: DevOps Pipeline Setup — `22.jpeg`*
+
+- Add Jenkinsfile script with Docker image build:
+
+```bash
+docker build -t gagan .
+docker run -d -p 85:80 gagan
 ```
-http://<Slave1-PUBLIC-IP>:85
-```
 
-![Verify Site on Port 85](images/step-5-verify-pipeline-site-on-port85.png)
+📸 *Image 13.1: Jenkinsfile Command Execution — `24.jpeg`*
 
----
+- Successful pipeline run confirmed
 
-## 🔁 GitHub Integration & Live Update
+📸 *Image 13.2: Green Success Status — `26.jpeg`*
 
-- Push code to GitHub → triggers webhook to Jenkins
-- Pipeline runs again → website updates instantly
+- Jenkins Dashboard now shows all pipelines:
 
----
-
-## 📌 Final Notes
-
-- Jenkins Master handles orchestration
-- Slave1 builds and serves website
-- GitHub triggers jobs automatically
-- Pipeline demonstrates end-to-end CI/CD with instant updates
+📸 *Image 13.3: Jenkins Dashboard Overview — `29.jpeg`*
 
 ---
 
-⏳ Let me know when you're ready to upload images for each step (0.1 to 5), and I’ll regenerate the final README with them embedded.
+## 🌍 14 - Deploy and Access Static Website
+
+- Go to AWS EC2 → Jenkins Slave1 → Copy Public IP
+- Edit Security Group → Inbound Rules → Add Custom TCP: Port 85
+
+📸 *Image 14.0: Public IP Display (Slave1) — `25.jpeg`*
+
+- Open browser → Visit: `http://<slave1_ip>:85`
+- Static Website should now be live
+
+---
+
+## ✏️ 15 - Real-time Code Update and Reflect
+
+- Go to GitHub repo → Edit HTML (e.g. Change title “shamrock” to “convent”)
+- Commit changes → Jenkins webhook triggers new build
+- Website instantly reflects updated content
+
+📸 *Image 15.0: Updated Website Header — `33.jpeg`*
+
+📸 *Image 15.1: Final Website with Updated Title — `34.jpeg`*
+
+---
+
+## 🌟 Final Highlights
+
+- ✅ End-to-end CI/CD pipeline built using **Jenkins**, **GitHub**, **Docker**, and **EC2**
+- 🔄 Real-time updates with **GitHub Webhooks** triggering Jenkins builds
+- 🚀 Static site deployment on **EC2 Slave1** with port 85 exposed
+- 🖥️ Confirmed content updates pushed to GitHub reflected instantly live
+
+---
+
+## 🔮 Future Steps
+
+- ☁️ Integrate **S3 & CloudFront** for production-level static hosting
+- 🔐 Configure **SSL with Let's Encrypt** and reverse proxy using **NGINX**
+- 📊 Add monitoring with **Prometheus & Grafana**
+- 🛡️ Harden Jenkins setup with **IAM roles** and **backup via S3/EBS**
