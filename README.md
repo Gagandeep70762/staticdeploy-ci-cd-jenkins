@@ -49,13 +49,14 @@ sudo systemctl start jenkins
 ## 🔐 3 - Unlock Jenkins Interface
 
 ![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/13.png)
-![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/15.png)
-![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/14.png)
+
 To access Jenkins setup wizard, run:
 
 ```bash
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 ```
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/15.png)
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/14.png)
 
 Paste the copied password into the browser screen at `http://<public-ip>:8080`
 
@@ -94,7 +95,7 @@ This lets Jenkins offload jobs from the master.
 - In **Build Environment**, restrict it to the label of your slave node (e.g., `slave1`)
 - Under **Build**, add a simple shell step:
   ```bash
-  echo "Hello from Slave Node!"
+  echo "The Jenkin agent is connected"
   ```
 - Save and run the job
 
@@ -104,13 +105,14 @@ This lets Jenkins offload jobs from the master.
 
 ---
 
-## image4🌐 7 - GitHub Integration via Webhook
+🌐 7 - GitHub Integration via Webhook
 
 - Go to GitHub → Repository Settings → Webhooks → Add Webhook
   - Payload URL: `http://<jenkins-ip>:8080/github-webhook/`
   - Content type: `application/json`
   - Select "Just the push event"
   - Click **Add webhook**
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/4.png)
 
 ✅ Now every code push triggers Jenkins automatically!
 
@@ -179,15 +181,17 @@ sudo usermod -aG docker ec2-user
 - Create pipeline: `DevOps-Production`
 - Add same GitHub repository & credentials
 
-- Add Jenkinsfile script with Docker image build:
-
 ```bash
 docker build -t gagan .
 docker run -d -p 85:80 gagan
 ```
 
 ![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/22.png)
+
 ![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/23.png)
+
+- Add Jenkinsfile script with Docker image build:
+
 ![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/24.png)
 
 ---
@@ -198,10 +202,12 @@ docker run -d -p 85:80 gagan
 - Edit Security Group → Inbound Rules → Add Custom TCP: Port 85
 
 ![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/26.png)
-![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/27.png)
-
 - Open browser → Visit: `http://<slave1_ip>:85`
+
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/25.png)
+
 - Static Website should now be live
+- ![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/27.png)
 
 ---
 
@@ -212,6 +218,7 @@ docker run -d -p 85:80 gagan
 - Website instantly reflects updated content
 
 ![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/34.png)
+Updated :
 ![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/33.png)
 
 ---
