@@ -1,9 +1,8 @@
 # 🚀 Static Website CI/CD Pipeline Using Jenkins, GitHub, Docker & AWS EC2
 
-Banner image (0.jpg) has been added below this header for a visual introduction.
 
 This project demonstrates an end-to-end CI/CD pipeline for deploying a static website using Jenkins master-slave architecture, GitHub, and Docker on AWS EC2 instances.
-
+https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/0.jpg
 ---
 
 ## 🧠 Overview
