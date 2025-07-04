@@ -16,11 +16,21 @@ This project demonstrates an end-to-end CI/CD pipeline for deploying a static we
 
 ![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/0.1.jpg)
 ![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/1.png)
-![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/2.png)
+
+## 🧠 Prerequisites
+
+Before you begin, ensure the following:
+
+- ✅ Basic knowledge of AWS S3 and static website hosting
+- ✅ AWS Account ([Sign Up Here](https://aws.amazon.com/))
+- ✅ A simple HTML/CSS website ready to deploy
+
+
 ---
 
 ## ☁️ 1 - Launch Jenkins Master EC2 Instance
 
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/2.png)
 
 - **AMI**: Amazon Linux 2
 - **Instance Type**: t2.medium
