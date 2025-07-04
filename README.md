@@ -7,7 +7,6 @@ This project demonstrates an end-to-end CI/CD pipeline for deploying a static we
 
 ## 🧠 Overview
 
-Images (0.1.jpg, 1.jpg, 2.jpg) are added under this section to enhance visual understanding of the architecture.
 
 - Jenkins installed on a **t2.medium** EC2 Master (Amazon Linux 2)
 - Two EC2 Slave Nodes used for offloading builds
@@ -15,21 +14,24 @@ Images (0.1.jpg, 1.jpg, 2.jpg) are added under this section to enhance visual un
 - Docker container used for building and running static site
 - Final output live on EC2 IP with exposed port
 
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/0.1.jpg)
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/1.png)
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/2.png)
 ---
 
 ## ☁️ 1 - Launch Jenkins Master EC2 Instance
 
-EC2 setup screenshots (30.jpeg, 11.jpeg) are inserted here.
 
 - **AMI**: Amazon Linux 2
 - **Instance Type**: t2.medium
 - **Ports**: SSH (22), HTTP (80), TCP (8080)
-
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/30.png)
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/11.png)
 ---
 
 ## ⚙️ 2 - Install Jenkins on Master
 
-Visual references (12.jpeg, 31.jpeg) added to explain Jenkins installation process.
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/12.png)
 
 ```bash
 #!/bin/bash
@@ -41,12 +43,14 @@ sudo dnf install jenkins -y
 sudo systemctl enable jenkins
 sudo systemctl start jenkins
 ```
-
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/31.png)
 ---
 
 ## 🔐 3 - Unlock Jenkins Interface
 
-Screenshots (13.jpeg, 15.jpeg, 14.jpeg) added to show the Jenkins unlock process.
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/13.png)
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/15.png)
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/14.png)
 To access Jenkins setup wizard, run:
 
 ```bash
@@ -59,14 +63,13 @@ Paste the copied password into the browser screen at `http://<public-ip>:8080`
 
 ## 🔒 4 - Open Port 8080 and Agent Port (40933) in Security Group
 
-Image 16.jpeg.
 
 Additionally, to allow slave nodes to communicate with the Jenkins master over a fixed TCP port (e.g., `40933`), you must also add this port to your EC2 Security Group:
 
 - Edit Inbound Rules → Add Custom TCP Rule with port `40933`, source `Anywhere`
 
 This is required if you choose a fixed TCP port for inbound agents in Jenkins (as shown in the Jenkins Security settings screen).
-
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/16.png)
 ---
 
 ## 🚀 5 - Create Jenkins Slave Nodes
@@ -80,7 +83,7 @@ Go to Jenkins Dashboard → **Manage Jenkins → Nodes → New Node**:
 
 This lets Jenkins offload jobs from the master.
 
-image 17 
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/17.png) 
 
 ---
 
@@ -97,7 +100,7 @@ image 17
 
 ✅ You should see output confirming the job executed on the slave.
 
-image 18
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/18.png)
 
 ---
 
@@ -111,7 +114,8 @@ image 18
 
 ✅ Now every code push triggers Jenkins automatically!
 
-image 20 and 21
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/20.png)
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/21.png)
 
 ---
 
@@ -121,7 +125,7 @@ image 20 and 21
 - Commit and push
 - Check Jenkins console → new build should trigger and reflect changes
 
-image 3
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/3.png)
 
 ---
 
@@ -152,7 +156,7 @@ sudo usermod -aG docker ec2-user
 - Add this as `slave2` in Jenkins → Manage Jenkins → Nodes → New Node
 - This helps distribute Jenkins jobs and manage build traffic efficiently
 
-image 4
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/4.png)
 
 ---
 
@@ -166,7 +170,7 @@ image 4
 
 ---
 
-## image 5
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/5.jpg)
 
 ---
 
@@ -182,7 +186,9 @@ docker build -t gagan .
 docker run -d -p 85:80 gagan
 ```
 
-image 22 23 24 
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/22.png)
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/23.png)
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/24.png)
 
 ---
 
@@ -191,7 +197,8 @@ image 22 23 24
 - Go to AWS EC2 → Jenkins Slave1 → Copy Public IP
 - Edit Security Group → Inbound Rules → Add Custom TCP: Port 85
 
-image 26 and 27
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/26.png)
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/27.png)
 
 - Open browser → Visit: `http://<slave1_ip>:85`
 - Static Website should now be live
@@ -204,7 +211,8 @@ image 26 and 27
 - Commit changes → Jenkins webhook triggers new build
 - Website instantly reflects updated content
 
-image 34 and 33
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/34.png)
+![](https://github.com/Gagandeep70762/staticdeploy-ci-cd-jenkins/blob/main/images/33.png)
 
 ---
 
